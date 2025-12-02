@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
 
-export default function RequestSent() {
+function RequestSentContent() {
   const searchParams = useSearchParams();
   const signed = searchParams.get('signed') === 'true';
 
@@ -30,6 +31,20 @@ export default function RequestSent() {
         </Link>
       </div>
     </main>
+  );
+}
+
+export default function RequestSent() {
+  return (
+    <Suspense fallback={
+      <main className={styles.container}>
+        <div className={styles.content}>
+          <div className={styles.loading}>Loading...</div>
+        </div>
+      </main>
+    }>
+      <RequestSentContent />
+    </Suspense>
   );
 }
 

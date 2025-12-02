@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 
+// Force dynamic rendering (uses searchParams)
+export const dynamic = 'force-dynamic';
+
 /**
  * Get user info for signing page based on token
  */

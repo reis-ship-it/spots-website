@@ -17,10 +17,10 @@ export default function SlideJourney() {
             <div key={index} className={styles.timelineItem}>
               <div className={styles.timelineWeek}>{item.week}</div>
               <div className={styles.timelineDescription}>"{item.description}"</div>
-              {item.outcome && (
+              {'outcome' in item && item.outcome && (
                 <div className={styles.timelineOutcome}>→ {item.outcome}</div>
               )}
-              {item.outcomes && (
+              {'outcomes' in item && item.outcomes && (
                 <div className={styles.timelineOutcomes}>
                   {item.outcomes.map((outcome, i) => (
                     <div key={i} className={styles.timelineOutcomeItem}>

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
@@ -132,6 +132,23 @@ export default function Home() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <main className={styles.container}>
+        <div className={styles.hero}>
+          <h1 className={styles.title}>SPOTS</h1>
+          <p className={styles.tagline}>
+            Opening doors to experiences, communities, people, meaning
+          </p>
+        </div>
+      </main>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
 
