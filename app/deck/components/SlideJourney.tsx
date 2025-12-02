@@ -13,24 +13,29 @@ export default function SlideJourney() {
         <h2 className={styles.slideTitle}>{journey.title}</h2>
         <div className={styles.flow}>{journey.flow}</div>
         <div className={styles.timeline}>
-          {journey.timeline.map((item, index) => (
-            <div key={index} className={styles.timelineItem}>
-              <div className={styles.timelineWeek}>{item.week}</div>
-              <div className={styles.timelineDescription}>"{item.description}"</div>
-              {'outcome' in item && item.outcome && (
-                <div className={styles.timelineOutcome}>→ {item.outcome}</div>
-              )}
-              {'outcomes' in item && item.outcomes && (
-                <div className={styles.timelineOutcomes}>
-                  {item.outcomes.map((outcome, i) => (
-                    <div key={i} className={styles.timelineOutcomeItem}>
-                      {outcome}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+          {journey.timeline.map((item, index) => {
+            const hasOutcome = 'outcome' in item;
+            const hasOutcomes = 'outcomes' in item;
+            
+            return (
+              <div key={index} className={styles.timelineItem}>
+                <div className={styles.timelineWeek}>{item.week}</div>
+                <div className={styles.timelineDescription}>"{item.description}"</div>
+                {hasOutcome && (item as { outcome: string }).outcome && (
+                  <div className={styles.timelineOutcome}>→ {(item as { outcome: string }).outcome}</div>
+                )}
+                {hasOutcomes && (item as { outcomes: readonly string[] }).outcomes && (
+                  <div className={styles.timelineOutcomes}>
+                    {(item as { outcomes: readonly string[] }).outcomes.map((outcome, i) => (
+                      <div key={i} className={styles.timelineOutcomeItem}>
+                        {outcome}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </Slide>
