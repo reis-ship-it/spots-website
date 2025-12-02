@@ -25,9 +25,19 @@ export async function sendAccessEmail({ to, name, accessToken, baseUrl: provided
   // Get base URL - use provided URL or detect from environment
   const baseUrl = providedUrl || getSiteBaseUrl();
   const accessLink = `${baseUrl}/access?token=${accessToken}`;
+  
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@yourdomain.com';
+  
+  console.log(`📧 Sending access email:`, {
+    from: fromEmail,
+    to,
+    baseUrl,
+    accessLink,
+    hasApiKey: !!process.env.RESEND_API_KEY,
+  });
 
   const { data, error } = await resend.emails.send({
-    from: resendFromEmail,
+    from: fromEmail,
     to,
     subject: 'Access to SPOTS Pitch Deck',
     html: `
@@ -73,10 +83,16 @@ export async function sendAccessEmail({ to, name, accessToken, baseUrl: provided
   });
 
   if (error) {
-    console.error('Error sending email:', error);
+    console.error('❌ Resend API error:', error);
+    console.error('📧 Email details:', {
+      from: resendFromEmail,
+      to,
+      subject: 'Access to SPOTS Pitch Deck',
+    });
     throw error;
   }
 
+  console.log(`✅ Email sent successfully: ${data?.id}`);
   return data;
 }
 

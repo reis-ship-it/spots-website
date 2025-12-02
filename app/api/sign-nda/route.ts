@@ -97,6 +97,8 @@ export async function POST(request: NextRequest) {
       .eq('id', record.id);
 
     // Send signed PDFs via email
+    const emailErrors: string[] = [];
+    
     try {
       // Send to viewer (person who signed)
       await sendSignedNDAToViewer({
@@ -104,19 +106,33 @@ export async function POST(request: NextRequest) {
         name: record.name || 'there',
         signedPdfBytes,
       });
+      console.log(`✅ Signed NDA email sent to viewer: ${record.email}`);
+    } catch (emailError: any) {
+      const errorMsg = emailError?.message || 'Unknown error';
+      console.error('❌ Error sending signed NDA to viewer:', errorMsg);
+      emailErrors.push(`Viewer email failed: ${errorMsg}`);
+      // Don't fail the request - signature is processed
+    }
 
-      // Send to owner (you) - get owner email from env
+    // Send to owner (you)
+    try {
       const ownerEmail = process.env.OWNER_EMAIL || process.env.RESEND_FROM_EMAIL;
-      if (ownerEmail) {
+      if (!ownerEmail) {
+        console.warn('⚠️ OWNER_EMAIL not set - skipping owner notification');
+        emailErrors.push('OWNER_EMAIL not configured');
+      } else {
         await sendSignedNDAToOwner({
           signedPdfBytes,
           signerName: record.name || 'Unknown',
           signerEmail: record.email,
           ownerEmail,
         });
+        console.log(`✅ Signed NDA email sent to owner: ${ownerEmail}`);
       }
-    } catch (emailError) {
-      console.error('Error sending signed NDA emails:', emailError);
+    } catch (emailError: any) {
+      const errorMsg = emailError?.message || 'Unknown error';
+      console.error('❌ Error sending signed NDA to owner:', errorMsg);
+      emailErrors.push(`Owner email failed: ${errorMsg}`);
       // Don't fail the request - signature is processed
     }
 
@@ -124,6 +140,8 @@ export async function POST(request: NextRequest) {
     try {
       // Get base URL from request
       const baseUrl = getBaseUrl(request);
+      console.log(`📧 Preparing to send access email to: ${record.email}`);
+      console.log(`🔗 Using base URL: ${baseUrl}`);
       
       await sendAccessEmail({
         to: record.email,
@@ -131,13 +149,18 @@ export async function POST(request: NextRequest) {
         accessToken,
         baseUrl,
       });
-    } catch (emailError) {
-      console.error('Error sending access email:', emailError);
-      // Log error details for debugging
-      console.error('Email error details:', {
-        message: emailError instanceof Error ? emailError.message : 'Unknown error',
-        stack: emailError instanceof Error ? emailError.stack : undefined,
-      });
+      console.log(`✅ Access email sent successfully to: ${record.email}`);
+    } catch (emailError: any) {
+      const errorMsg = emailError?.message || 'Unknown error';
+      const errorDetails = emailError?.response?.data || emailError;
+      console.error('❌ Error sending access email:', errorMsg);
+      console.error('📋 Email error details:', JSON.stringify(errorDetails, null, 2));
+      emailErrors.push(`Access email failed: ${errorMsg}`);
+      
+      // Log Resend-specific errors
+      if (emailError?.response) {
+        console.error('📧 Resend API Response:', emailError.response);
+      }
     }
 
     return NextResponse.json({
