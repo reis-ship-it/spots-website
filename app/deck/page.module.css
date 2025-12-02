@@ -1,0 +1,24 @@
+.deckContainer {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth;
+}
+
+.deckContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.deckContainer::-webkit-scrollbar-track {
+  background: var(--color-grey-100);
+}
+
+.deckContainer::-webkit-scrollbar-thumb {
+  background: var(--color-grey-400);
+  border-radius: 4px;
+}
+
+.deckContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--color-grey-500);
+}
+

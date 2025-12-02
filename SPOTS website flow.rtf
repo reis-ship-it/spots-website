@@ -1,0 +1,97 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 .SFNS-Regular;\f1\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;\red14\green14\blue14;}
+{\*\expandedcolortbl;;\cssrgb\c6700\c6700\c6700;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\sl324\slmult1\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf2 User flow for automated NDA gated pitch deck\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+
+\f1 \cf2 	1.	Steps\
+\
+User fills form with name and email.\
+Backend sends a DocuSign NDA envelope.\
+DocuSign sends a webhook to backend when envelope is completed.\
+Backend verifies completion.\
+Backend generates a unique token.\
+Backend stores token with expiration.\
+Backend emails user an access link with the token.\
+User clicks link.\
+Backend verifies token and expiration.\
+Backend creates a session and redirects to deck.\
+	2.	Data model\
+\
+table: nda_access\
+\pard\tqr\tx100\tx260\li260\fi-260\sl324\slmult1\sb240\partightenfactor0
+\cf2 	\'95	id\
+	\'95	email\
+	\'95	envelope_id\
+	\'95	status (pending or completed)\
+	\'95	token\
+	\'95	token_expires_at\
+	\'95	nda_version\
+	\'95	created_at\
+	\'95	updated_at\
+\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+\cf2 	3.	Request access route\
+\
+POST /api/request-access\
+Inputs: name, email\
+Actions:\
+\pard\tqr\tx100\tx260\li260\fi-260\sl324\slmult1\sb240\partightenfactor0
+\cf2 	\'95	Validate input.\
+	\'95	Create or update nda_access row with status pending.\
+	\'95	Send DocuSign NDA envelope using template.\
+	\'95	Return success.\
+\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+\cf2 	4.	DocuSign webhook route\
+\
+POST /api/docusign-webhook\
+Actions:\
+\pard\tqr\tx100\tx260\li260\fi-260\sl324\slmult1\sb240\partightenfactor0
+\cf2 	\'95	Verify webhook signature.\
+	\'95	Parse envelopeId, status, recipient email.\
+	\'95	If status is completed, find nda_access row.\
+	\'95	Generate token.\
+	\'95	Set expiration.\
+	\'95	Update row to completed.\
+	\'95	Email access link to signer.\
+\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+\cf2 	5.	Access link route\
+\
+GET /access?token=TOKEN\
+Actions:\
+\pard\tqr\tx100\tx260\li260\fi-260\sl324\slmult1\sb240\partightenfactor0
+\cf2 	\'95	Validate token.\
+	\'95	Check status is completed.\
+	\'95	Check expiration.\
+	\'95	Create session cookie containing email and nda_version.\
+	\'95	Redirect to deck.\
+\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+\cf2 	6.	Deck route\
+\
+GET /deck\
+Actions:\
+\pard\tqr\tx100\tx260\li260\fi-260\sl324\slmult1\sb240\partightenfactor0
+\cf2 	\'95	Verify session cookie.\
+	\'95	If valid, show pitch deck.\
+	\'95	If missing or invalid, redirect to request-access page.\
+\
+\pard\tqr\tx260\tx420\li420\fi-420\sl324\slmult1\sb240\partightenfactor0
+\cf2 	7.	DocuSign configuration\
+\
+Create NDA template.\
+Create integration key.\
+Configure Connect webhook for envelope completed events.\
+	8.	User experience\
+\
+Request-access page displays a short explanation.\
+User receives NDA email.\
+User signs NDA.\
+User receives access link automatically.\
+Link opens deck if valid.\'92}

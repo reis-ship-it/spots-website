@@ -1,0 +1,209 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  background-color: var(--color-background);
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+}
+
+.title {
+  font-size: var(--font-size-display-medium);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.subtitle {
+  font-size: var(--font-size-body-large);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xxl);
+  text-align: center;
+}
+
+.pdfContainer {
+  margin-bottom: var(--spacing-xxl);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-white);
+}
+
+.pdfPlaceholder {
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxxl);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.pdfNote {
+  font-size: var(--font-size-body-small);
+  margin-top: var(--spacing-md);
+  color: var(--color-text-hint);
+}
+
+.signatureSection {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xxl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-headline-medium);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.signatureTabs {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 1px solid var(--color-grey-300);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-medium);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  border-color: var(--color-electric-green);
+}
+
+.tab.active {
+  background-color: var(--color-electric-green);
+  color: var(--color-black);
+  border-color: var(--color-electric-green);
+}
+
+.signatureCanvas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.canvas {
+  width: 100%;
+  height: 200px;
+  cursor: crosshair;
+}
+
+.clearButton {
+  align-self: flex-start;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--color-grey-300);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-medium);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.clearButton:hover {
+  border-color: var(--color-electric-green);
+}
+
+.typedSignature {
+  width: 100%;
+}
+
+.nameInput {
+  width: 100%;
+  padding: var(--input-padding-vertical) var(--input-padding-horizontal);
+  border-radius: var(--input-border-radius);
+  border: var(--input-border-width) solid var(--input-border-color);
+  background-color: var(--input-background-color);
+  font-size: var(--font-size-headline-small);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-width: var(--input-focus-border-width);
+  border-color: var(--input-focus-border-color);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.submitButton {
+  padding: var(--button-padding-vertical) var(--button-padding-horizontal);
+  border-radius: var(--button-border-radius);
+  background-color: var(--color-electric-green);
+  color: var(--color-black);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  min-width: 200px;
+}
+
+.submitButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  padding: var(--spacing-md);
+  background-color: rgba(255, 77, 77, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-size: var(--font-size-body-medium);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.legalNote {
+  font-size: var(--font-size-body-small);
+  color: var(--color-text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+.loading {
+  text-align: center;
+  font-size: var(--font-size-body-large);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg);
+  }
+
+  .signatureSection {
+    padding: var(--spacing-xl);
+  }
+}
+
