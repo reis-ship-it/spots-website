@@ -5,6 +5,7 @@ import { sendSignedNDAToViewer, sendSignedNDAToOwner } from '@/lib/email/signed-
 import { generateAccessToken, getTokenExpiration } from '@/lib/utils/tokens';
 import { sendAccessEmail } from '@/lib/email/client';
 import { getBaseUrl } from '@/lib/utils/url';
+import { delay } from '@/lib/utils/delay';
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,10 +98,11 @@ export async function POST(request: NextRequest) {
       .eq('id', record.id);
 
     // Send signed PDFs via email
+    // Resend rate limit: 2 requests per second, so we need delays between emails
     const emailErrors: string[] = [];
     
+    // Email 1: Send to viewer (person who signed)
     try {
-      // Send to viewer (person who signed)
       await sendSignedNDAToViewer({
         to: record.email,
         name: record.name || 'there',
@@ -114,7 +116,10 @@ export async function POST(request: NextRequest) {
       // Don't fail the request - signature is processed
     }
 
-    // Send to owner (you)
+    // Wait 600ms to respect Resend rate limit (2 requests/second)
+    await delay(600);
+
+    // Email 2: Send to owner (you)
     try {
       const ownerEmail = process.env.OWNER_EMAIL || process.env.RESEND_FROM_EMAIL;
       if (!ownerEmail) {
@@ -136,7 +141,10 @@ export async function POST(request: NextRequest) {
       // Don't fail the request - signature is processed
     }
 
-    // Send access email
+    // Wait 600ms to respect Resend rate limit
+    await delay(600);
+
+    // Email 3: Send access email
     try {
       // Get base URL from request
       const baseUrl = getBaseUrl(request);
