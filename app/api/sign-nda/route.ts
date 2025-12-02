@@ -6,6 +6,7 @@ import { generateAccessToken, getTokenExpiration } from '@/lib/utils/tokens';
 import { sendAccessEmail } from '@/lib/email/client';
 import { getBaseUrl } from '@/lib/utils/url';
 import { delay } from '@/lib/utils/delay';
+import { resend } from '@/lib/email/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -161,9 +162,42 @@ export async function POST(request: NextRequest) {
     } catch (emailError: any) {
       const errorMsg = emailError?.message || 'Unknown error';
       const errorDetails = emailError?.response?.data || emailError;
+      const isValidationError = errorMsg.includes('validation_error') || 
+                                errorMsg.includes('testing emails') ||
+                                errorDetails?.name === 'validation_error';
+      
       console.error('❌ Error sending access email:', errorMsg);
       console.error('📋 Email error details:', JSON.stringify(errorDetails, null, 2));
       emailErrors.push(`Access email failed: ${errorMsg}`);
+      
+      // If domain validation error, send access email to owner as fallback
+      if (isValidationError) {
+        const ownerEmail = process.env.OWNER_EMAIL || process.env.RESEND_FROM_EMAIL;
+        if (ownerEmail) {
+          try {
+            console.log(`⚠️ Domain not verified. Sending access email to owner (${ownerEmail}) as fallback...`);
+            const baseUrl = getBaseUrl(request);
+            const accessLink = `${baseUrl}/access?token=${accessToken}`;
+            
+            // Send to owner with instructions to forward
+            await resend.emails.send({
+              from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+              to: ownerEmail,
+              subject: `🔗 Forward: Access Link for ${record.name || record.email}`,
+              html: `
+                <h2>Please Forward This Access Link</h2>
+                <p><strong>To:</strong> ${record.name || 'User'} (${record.email})</p>
+                <p><strong>Message:</strong> Here is your access link to the SPOTS pitch deck:</p>
+                <p><a href="${accessLink}">${accessLink}</a></p>
+                <p><em>Note: This is a temporary workaround until domain verification is complete.</em></p>
+              `,
+            });
+            console.log(`✅ Access link sent to owner (${ownerEmail}) for forwarding`);
+          } catch (fallbackError: any) {
+            console.error('❌ Failed to send fallback email to owner:', fallbackError?.message);
+          }
+        }
+      }
       
       // Log Resend-specific errors
       if (emailError?.response) {
