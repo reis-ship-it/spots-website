@@ -13,16 +13,17 @@ export interface SendAccessEmailParams {
   to: string;
   name: string;
   accessToken: string;
+  baseUrl?: string; // Optional: provide URL from request if available
 }
+
+import { getBaseUrl as getSiteBaseUrl } from '@/lib/utils/url';
 
 /**
  * Send access email with token link
  */
-export async function sendAccessEmail({ to, name, accessToken }: SendAccessEmailParams) {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  
+export async function sendAccessEmail({ to, name, accessToken, baseUrl: providedUrl }: SendAccessEmailParams) {
+  // Get base URL - use provided URL or detect from environment
+  const baseUrl = providedUrl || getSiteBaseUrl();
   const accessLink = `${baseUrl}/access?token=${accessToken}`;
 
   const { data, error } = await resend.emails.send({

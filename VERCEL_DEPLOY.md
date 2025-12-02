@@ -42,7 +42,7 @@
    OWNER_EMAIL=reisjgordon@gmail.com
 
    # App Config
-   NDA_VERSION=1.0
+   NDA_VERSION=2
    ACCESS_TOKEN_EXPIRY_DAYS=30
    SESSION_COOKIE_NAME=spots_nda_session
    ```

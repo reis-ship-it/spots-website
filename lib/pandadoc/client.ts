@@ -57,7 +57,7 @@ export async function sendDocumentForSignature({
           },
         ],
         metadata: {
-          nda_version: process.env.NDA_VERSION || '1.0',
+          nda_version: process.env.NDA_VERSION || '2',
         },
       }),
     });

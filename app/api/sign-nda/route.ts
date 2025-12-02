@@ -4,6 +4,7 @@ import { getNDAPDF, overlaySignatureOnPDF, overlayTextSignatureOnPDF, base64ToUi
 import { sendSignedNDAToViewer, sendSignedNDAToOwner } from '@/lib/email/signed-nda';
 import { generateAccessToken, getTokenExpiration } from '@/lib/utils/tokens';
 import { sendAccessEmail } from '@/lib/email/client';
+import { getBaseUrl } from '@/lib/utils/url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -121,13 +122,22 @@ export async function POST(request: NextRequest) {
 
     // Send access email
     try {
+      // Get base URL from request
+      const baseUrl = getBaseUrl(request);
+      
       await sendAccessEmail({
         to: record.email,
         name: record.name || 'there',
         accessToken,
+        baseUrl,
       });
     } catch (emailError) {
       console.error('Error sending access email:', emailError);
+      // Log error details for debugging
+      console.error('Email error details:', {
+        message: emailError instanceof Error ? emailError.message : 'Unknown error',
+        stack: emailError instanceof Error ? emailError.stack : undefined,
+      });
     }
 
     return NextResponse.json({

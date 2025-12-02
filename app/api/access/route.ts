@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/deck', request.url));
     createSession(response, {
       email: record.email,
-      ndaVersion: record.nda_version || '1.0',
+      ndaVersion: record.nda_version || '2',
       signedAt: record.signed_at || new Date().toISOString(),
     });
 

@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       name,
       company: company || null,
       status: 'pending',
-      nda_version: process.env.NDA_VERSION || '1.0',
+      nda_version: process.env.NDA_VERSION || '2',
     };
 
     let record;
